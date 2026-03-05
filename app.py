@@ -75,7 +75,8 @@ def login():
 @login_required
 def dashboard():
     files = os.listdir(app.config['UPLOAD_FOLDER'])
-    return render_template("dashboard.html", username=current_user.username, files=files)
+    users = User.query.all()
+    return render_template("dashboard.html", username=current_user.username, files=files, users=users)
 
 # Logout Route
 @app.route("/logout")

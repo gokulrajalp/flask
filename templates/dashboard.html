@@ -18,6 +18,23 @@
       <li><a href="/download/{{ file }}">{{ file }}</a></li>
     {% endfor %}
    </ul>
+
+   <h2>Users</h2>
+
+   <table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Username</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+      <td>{{ user.id }}</td>
+      <td>{{ user.username }}</td>
+    </tr>
+    {% endfor %}
+   </table>
+
+   
     <a href="/logout">Logout</a>
 </body>
 </html>
