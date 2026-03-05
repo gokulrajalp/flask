@@ -6,6 +6,18 @@
 <body>
     <h2>Welcome {{ username }}</h2>
     <br>
+    <h2>Uploaded Files</h2>
+   <form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" id="fileInput">
+     <button type="submit">Upload</button>
+   </form>
+
+   <h2>Available Files</h2>
+   <ul>
+    {% for file in files %}
+      <li><a href="/download/{{ file }}">{{ file }}</a></li>
+    {% endfor %}
+   </ul>
     <a href="/logout">Logout</a>
 </body>
 </html>

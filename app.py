@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 app = Flask(__name__)
 
@@ -73,7 +74,8 @@ def login():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("dashboard.html", username=current_user.username)
+    files = os.listdir(app.config['UPLOAD_FOLDER'])
+    return render_template("dashboard.html", username=current_user.username, files=files)
 
 # Logout Route
 @app.route("/logout")
@@ -82,7 +84,46 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+@app.route("/upload", methods=["POST"])
+@login_required
+def upload():
+    if 'file' not in request.files:
+        return "No file part"
+    
+    file = request.files['file']
+    
+    if file.filename == '':
+        return "No selected file"
+    
+    if file:
+        filename = file.filename
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return redirect(url_for("dashboard"))
+    
+@app.route("/download/<filename>")
+@login_required
+def download(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     app.run(debug=True)
+
+
+# from flask import Flask, render_template
+
+# app = Flask(__name__)
+
+# @app.route('/')
+# def home():
+#     return render_template('login.html')
+
+# if __name__ == '__main__':
+#     app.run(debug=True)
